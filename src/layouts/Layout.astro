@@ -87,6 +87,7 @@ const fullOgImage = ogImage ? siteUrl + ogImage : siteUrl + "/default-og.png";
                 ? "dark"
                 : "light";
             const theme = storedTheme || systemTheme;
+            if (!storedTheme) localStorage.setItem("theme", theme);
             if (theme === "dark") {
                 document.documentElement.classList.add("dark");
             }

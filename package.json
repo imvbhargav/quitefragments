@@ -1,0 +1,23 @@
+{
+  "name": "qf-new",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.12",
+    "@lucide/astro": "^0.539.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "astro": "^5.12.9",
+    "marked": "^16.1.2",
+    "satori": "^0.16.2",
+    "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16"
+  }
+}

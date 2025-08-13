@@ -1,0 +1,48 @@
+---
+import { SquareArrowUpRight } from "@lucide/astro";
+const { title, description, url } = Astro.props;
+---
+
+<div
+    class="px-2 lg:px-12 pb-4 flex items-center justify-center flex-col text-xs md:text-base lg:text-lg"
+>
+    <p class="mb-4 text-fglight dark:text-fgdark font-medium text-center">
+        Liked this fragment? Share it with friends!
+    </p>
+
+    <button
+        class="px-4 py-2 rounded-lg bg-acclight/50 text-white dark:bg-accdark/50 hover:opacity-90 transition flex items-center gap-2"
+        data-title={title}
+        data-text={description}
+        data-url={url}
+    >
+        <SquareArrowUpRight />
+        Share this fragment
+    </button>
+
+    <script is:inline>
+        const btn = document.currentScript.previousElementSibling; // the <button>
+        const shareData = {
+            title: btn.dataset.title,
+            text: btn.dataset.text,
+            url: btn.dataset.url,
+        };
+
+        btn.addEventListener("click", async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.error("Share cancelled", err);
+                }
+            } else {
+                try {
+                    await navigator.clipboard.writeText(shareData.url);
+                    alert("Link copied to clipboard!");
+                } catch (err) {
+                    console.error("Failed to copy", err);
+                }
+            }
+        });
+    </script>
+</div>

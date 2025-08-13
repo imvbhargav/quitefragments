@@ -1,0 +1,643 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+const posts = await getCollection("fragments");
+// Sort posts by date in descending order (latest first)
+const sortedPosts = posts.sort(
+    (a, b) => new Date(b.data.date) - new Date(a.data.date),
+);
+import { Search } from "@lucide/astro";
+---
+
+<Layout>
+    <section
+        class="text-fglight dark:text-fgdark divide-y-2 divide-acclight/50 dark:divide-accdark/50 border-acclight/50 dark:border-accdark/50"
+    >
+        <div
+            class="flex gap-4 items-center justify-center font-semibold py-4 px-2 lg:px-12 text-center w-full"
+        >
+            <Search size={20} class="text-acclight dark:text-accdark" />
+            <input
+                id="search-box-mobile"
+                autocomplete="off"
+                placeholder="Search Fragments"
+                class="block lg:hidden focus:outline-none flex-1"
+            />
+            <input
+                id="search-box"
+                autocomplete="off"
+                placeholder="Search Fragments (Ctrl + K)"
+                class="hidden lg:block focus:outline-none flex-1"
+            />
+        </div>
+        {
+            sortedPosts.map((post) => (
+                <a
+                    href={`/fragments/${post.id}`}
+                    class="py-4 px-2 lg:px-12 flex gap-4 items-center hover:font-semibold post-link"
+                    data-title={post.data.title.toLowerCase()}
+                    data-date={post.data.date.toISOString()}
+                    data-date-string={post.data.date.toDateString()}
+                >
+                    <div class="flex-1 flex-col-reverse md:flex-row flex md:items-center justify-between">
+                        <p>{post.data.title}</p>
+                        <p class="text-xs text-fglight/50 dark:text-fgdark/50 md:w-48 md:text-right">
+                            {post.data.date.toDateString()}
+                        </p>
+                    </div>
+                </a>
+            ))
+        }
+    </section>
+    <script>
+        const searchBox = document.getElementById("search-box");
+        const searchBoxMobile = document.getElementById("search-box-mobile");
+        const allPosts = document.querySelectorAll(".post-link");
+
+        function parseSearchQuery(query) {
+            const lowerQuery = query.toLowerCase().trim();
+
+            // Check for date patterns
+            const datePatterns = [
+                // YYYY format
+                /^(\d{4})$/,
+                // MM/YYYY or MM-YYYY format
+                /^(\d{1,2})[\/\-](\d{4})$/,
+                // DD/MM/YYYY, MM/DD/YYYY, DD-MM-YYYY, MM-DD-YYYY format
+                /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/,
+                // Day of month (1-31)
+                /^(\d{1,2})$/,
+                // Day and month combinations (10 Jan, Jan 10, 10th, etc.)
+                /^(\d{1,2})(st|nd|rd|th)?$/,
+                // Month names (partial matching)
+                /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/,
+                // Full month names
+                /^(january|february|march|april|may|june|july|august|september|october|november|december)/,
+                // Month Year format (Aug 2025, January 2024, etc.)
+                /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(\d{4})$/,
+                /^(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})$/,
+                // Day Month format (13 Aug, 25 January, etc.)
+                /^(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/,
+                /^(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)/,
+                // Day Month Year format (13 Aug 2025, 25 January 2024, etc.) - NEW PATTERN
+                /^(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(\d{4})$/,
+                /^(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})$/,
+                // Weekday names
+                /^(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)/,
+                // Relative dates
+                /^(today|yesterday|tomorrow|this week|last week|this month|last month|this year|last year)/,
+            ];
+
+            let isDateSearch = false;
+            let searchTerms = [];
+
+            // Check if the entire query matches a date pattern first
+            for (const pattern of datePatterns) {
+                if (pattern.test(lowerQuery)) {
+                    isDateSearch = true;
+                    // For date searches, don't treat individual words as title search terms
+                    return {
+                        isDateSearch,
+                        titleSearchTerms: [],
+                        originalQuery: lowerQuery,
+                    };
+                }
+            }
+
+            // Split query into words for mixed search only if no complete date pattern matched
+            const words = lowerQuery
+                .split(/\s+/)
+                .filter((word) => word.length > 0);
+
+            for (const word of words) {
+                let foundDatePattern = false;
+                for (const pattern of datePatterns) {
+                    if (pattern.test(word)) {
+                        isDateSearch = true;
+                        foundDatePattern = true;
+                        break;
+                    }
+                }
+
+                // Special case for day of month (1-31)
+                const dayMatch = word.match(/^(\d{1,2})(st|nd|rd|th)?$/);
+                if (dayMatch) {
+                    const day = parseInt(dayMatch[1]);
+                    if (day >= 1 && day <= 31) {
+                        isDateSearch = true;
+                        foundDatePattern = true;
+                    }
+                }
+
+                // If it's not a date pattern, treat as title search term
+                if (!foundDatePattern) {
+                    searchTerms.push(word);
+                }
+            }
+
+            return {
+                isDateSearch,
+                titleSearchTerms: searchTerms,
+                originalQuery: lowerQuery,
+            };
+        }
+
+        function matchesDate(dateString, query) {
+            const lowerDateString = dateString.toLowerCase();
+            const date = new Date(dateString);
+            const today = new Date();
+            const words = query.split(/\s+/).filter((word) => word.length > 0);
+
+            // Special handling for "DD MMM YYYY" format (e.g., "13 Aug 2025")
+            const dayMonthYearMatch = query.match(
+                /^(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})$/i,
+            );
+            if (dayMonthYearMatch) {
+                const searchDay = parseInt(dayMonthYearMatch[1]);
+                const monthText = dayMonthYearMatch[2].toLowerCase();
+                const searchYear = parseInt(dayMonthYearMatch[3]);
+
+                const monthNames = [
+                    "january",
+                    "february",
+                    "march",
+                    "april",
+                    "may",
+                    "june",
+                    "july",
+                    "august",
+                    "september",
+                    "october",
+                    "november",
+                    "december",
+                ];
+                const shortMonthNames = [
+                    "jan",
+                    "feb",
+                    "mar",
+                    "apr",
+                    "may",
+                    "jun",
+                    "jul",
+                    "aug",
+                    "sep",
+                    "oct",
+                    "nov",
+                    "dec",
+                ];
+
+                let searchMonth = -1;
+                for (let i = 0; i < monthNames.length; i++) {
+                    if (
+                        monthNames[i] === monthText ||
+                        shortMonthNames[i] === monthText ||
+                        monthNames[i].startsWith(monthText)
+                    ) {
+                        searchMonth = i;
+                        break;
+                    }
+                }
+
+                if (
+                    searchMonth !== -1 &&
+                    date.getDate() === searchDay &&
+                    date.getMonth() === searchMonth &&
+                    date.getFullYear() === searchYear
+                ) {
+                    return true;
+                }
+                return false; // If it's a day-month-year pattern but doesn't match, return false
+            }
+
+            // Special handling for "DD MMM" format (e.g., "13 Aug")
+            const dayMonthMatch = query.match(
+                /^(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|january|february|march|april|may|june|july|august|september|october|november|december)$/i,
+            );
+            if (dayMonthMatch) {
+                const searchDay = parseInt(dayMonthMatch[1]);
+                const monthText = dayMonthMatch[2].toLowerCase();
+
+                const monthNames = [
+                    "january",
+                    "february",
+                    "march",
+                    "april",
+                    "may",
+                    "june",
+                    "july",
+                    "august",
+                    "september",
+                    "october",
+                    "november",
+                    "december",
+                ];
+                const shortMonthNames = [
+                    "jan",
+                    "feb",
+                    "mar",
+                    "apr",
+                    "may",
+                    "jun",
+                    "jul",
+                    "aug",
+                    "sep",
+                    "oct",
+                    "nov",
+                    "dec",
+                ];
+
+                let searchMonth = -1;
+                for (let i = 0; i < monthNames.length; i++) {
+                    if (
+                        monthNames[i] === monthText ||
+                        shortMonthNames[i] === monthText ||
+                        monthNames[i].startsWith(monthText)
+                    ) {
+                        searchMonth = i;
+                        break;
+                    }
+                }
+
+                if (
+                    searchMonth !== -1 &&
+                    date.getDate() === searchDay &&
+                    date.getMonth() === searchMonth
+                ) {
+                    return true;
+                }
+                return false; // If it's a day-month pattern but doesn't match, return false
+            }
+
+            // Check each word in the query for other patterns
+            for (const word of words) {
+                // Day of month matching (1-31, including ordinals like 1st, 2nd, 3rd, 10th)
+                const dayMatch = word.match(/^(\d{1,2})(st|nd|rd|th)?$/);
+                if (dayMatch) {
+                    const searchDay = parseInt(dayMatch[1]);
+                    if (
+                        searchDay >= 1 &&
+                        searchDay <= 31 &&
+                        date.getDate() === searchDay
+                    ) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                // Year matching
+                if (/^\d{4}$/.test(word)) {
+                    if (date.getFullYear().toString() === word) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                // Month/Year matching (MM/YYYY or MM-YYYY)
+                const monthYearMatch =
+                    word.match(/^(\d{1,2})[\/\-](\d{4})$/) ||
+                    query.match(/^(\d{1,2})[\/\-](\d{4})$/);
+                if (monthYearMatch) {
+                    const searchMonth = parseInt(monthYearMatch[1]) - 1;
+                    const searchYear = parseInt(monthYearMatch[2]);
+                    if (
+                        date.getMonth() === searchMonth &&
+                        date.getFullYear() === searchYear
+                    ) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                // Month Year format matching (Aug 2025, January 2024, etc.)
+                const monthYearTextMatch =
+                    query.match(
+                        /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\s+(\d{4})$/i,
+                    ) ||
+                    query.match(
+                        /^(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})$/i,
+                    );
+
+                if (monthYearTextMatch) {
+                    const monthText = monthYearTextMatch[1].toLowerCase();
+                    const searchYear = parseInt(monthYearTextMatch[2]);
+
+                    const monthNames = [
+                        "january",
+                        "february",
+                        "march",
+                        "april",
+                        "may",
+                        "june",
+                        "july",
+                        "august",
+                        "september",
+                        "october",
+                        "november",
+                        "december",
+                    ];
+                    const shortMonthNames = [
+                        "jan",
+                        "feb",
+                        "mar",
+                        "apr",
+                        "may",
+                        "jun",
+                        "jul",
+                        "aug",
+                        "sep",
+                        "oct",
+                        "nov",
+                        "dec",
+                    ];
+
+                    let searchMonth = -1;
+                    for (let i = 0; i < monthNames.length; i++) {
+                        if (
+                            monthNames[i] === monthText ||
+                            shortMonthNames[i] === monthText ||
+                            monthNames[i].startsWith(monthText)
+                        ) {
+                            searchMonth = i;
+                            break;
+                        }
+                    }
+
+                    if (
+                        searchMonth !== -1 &&
+                        date.getMonth() === searchMonth &&
+                        date.getFullYear() === searchYear
+                    ) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                // Full date matching (DD/MM/YYYY, MM/DD/YYYY, etc.)
+                const fullDateMatch =
+                    word.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/) ||
+                    query.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+                if (fullDateMatch) {
+                    const num1 = parseInt(fullDateMatch[1]);
+                    const num2 = parseInt(fullDateMatch[2]);
+                    const year = parseInt(fullDateMatch[3]);
+
+                    const date1 = new Date(year, num2 - 1, num1); // DD/MM/YYYY
+                    const date2 = new Date(year, num1 - 1, num2); // MM/DD/YYYY
+
+                    const targetDate = new Date(
+                        date.getFullYear(),
+                        date.getMonth(),
+                        date.getDate(),
+                    );
+
+                    if (
+                        date1.getTime() === targetDate.getTime() ||
+                        date2.getTime() === targetDate.getTime()
+                    ) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                // Weekday matching
+                const weekdays = [
+                    "sunday",
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                ];
+                const shortWeekdays = [
+                    "sun",
+                    "mon",
+                    "tue",
+                    "wed",
+                    "thu",
+                    "fri",
+                    "sat",
+                ];
+
+                const dayOfWeek = date.getDay();
+                if (
+                    weekdays[dayOfWeek] === word ||
+                    shortWeekdays[dayOfWeek] === word
+                ) {
+                    return true;
+                }
+
+                // Check for partial weekday matches
+                for (let i = 0; i < weekdays.length; i++) {
+                    if (weekdays[i].startsWith(word) && word.length >= 3) {
+                        if (dayOfWeek === i) return true;
+                    }
+                }
+
+                // Month name matching
+                const monthNames = [
+                    "january",
+                    "february",
+                    "march",
+                    "april",
+                    "may",
+                    "june",
+                    "july",
+                    "august",
+                    "september",
+                    "october",
+                    "november",
+                    "december",
+                ];
+                const shortMonthNames = [
+                    "jan",
+                    "feb",
+                    "mar",
+                    "apr",
+                    "may",
+                    "jun",
+                    "jul",
+                    "aug",
+                    "sep",
+                    "oct",
+                    "nov",
+                    "dec",
+                ];
+
+                for (let i = 0; i < monthNames.length; i++) {
+                    if (
+                        monthNames[i].startsWith(word) ||
+                        shortMonthNames[i] === word
+                    ) {
+                        if (date.getMonth() === i) return true;
+                    }
+                }
+
+                // Relative date matching
+                const postDate = new Date(
+                    date.getFullYear(),
+                    date.getMonth(),
+                    date.getDate(),
+                );
+                const todayDate = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    today.getDate(),
+                );
+                const yesterday = new Date(todayDate);
+                yesterday.setDate(yesterday.getDate() - 1);
+                const tomorrow = new Date(todayDate);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+
+                switch (word) {
+                    case "today":
+                        if (postDate.getTime() === todayDate.getTime())
+                            return true;
+                        break;
+                    case "yesterday":
+                        if (postDate.getTime() === yesterday.getTime())
+                            return true;
+                        break;
+                    case "tomorrow":
+                        if (postDate.getTime() === tomorrow.getTime())
+                            return true;
+                        break;
+                }
+
+                // Week-based relative dates
+                if (query.includes("this week")) {
+                    const startOfWeek = new Date(today);
+                    const dayOfWeek = today.getDay();
+                    startOfWeek.setDate(today.getDate() - dayOfWeek);
+                    const endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+                    if (postDate >= startOfWeek && postDate <= endOfWeek)
+                        return true;
+                }
+
+                if (query.includes("last week")) {
+                    const startOfLastWeek = new Date(today);
+                    const dayOfWeek = today.getDay();
+                    startOfLastWeek.setDate(today.getDate() - dayOfWeek - 7);
+                    const endOfLastWeek = new Date(startOfLastWeek);
+                    endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
+
+                    if (
+                        postDate >= startOfLastWeek &&
+                        postDate <= endOfLastWeek
+                    )
+                        return true;
+                }
+
+                // Month-based relative dates
+                if (query.includes("this month")) {
+                    if (
+                        date.getMonth() === today.getMonth() &&
+                        date.getFullYear() === today.getFullYear()
+                    )
+                        return true;
+                }
+
+                if (query.includes("last month")) {
+                    const lastMonth = new Date(
+                        today.getFullYear(),
+                        today.getMonth() - 1,
+                        1,
+                    );
+                    if (
+                        date.getMonth() === lastMonth.getMonth() &&
+                        date.getFullYear() === lastMonth.getFullYear()
+                    )
+                        return true;
+                }
+
+                // Year-based relative dates
+                if (query.includes("this year")) {
+                    if (date.getFullYear() === today.getFullYear()) return true;
+                }
+
+                if (query.includes("last year")) {
+                    if (date.getFullYear() === today.getFullYear() - 1)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        function filterPosts(event) {
+            const query = event.target.value.trim();
+
+            if (query === "") {
+                // Show all posts if search is empty
+                allPosts.forEach((post) => {
+                    post.style.display = "flex";
+                });
+                return;
+            }
+
+            const { isDateSearch, titleSearchTerms, originalQuery } =
+                parseSearchQuery(query);
+
+            allPosts.forEach((post) => {
+                const title = post.getAttribute("data-title");
+                const dateString = post.getAttribute("data-date");
+                const dateDisplayString = post.getAttribute("data-date-string");
+
+                let matchesTitle = true;
+                let matchesDateQuery = true;
+
+                // Check title matching for non-date terms
+                if (titleSearchTerms.length > 0) {
+                    matchesTitle = titleSearchTerms.every((term) =>
+                        title.includes(term),
+                    );
+                }
+
+                // Check date matching if there are date patterns in the query
+                if (isDateSearch) {
+                    matchesDateQuery =
+                        matchesDate(dateString, originalQuery) ||
+                        matchesDate(dateDisplayString, originalQuery);
+                }
+
+                // Show post if it matches both title and date criteria
+                if (matchesTitle && matchesDateQuery) {
+                    post.style.display = "flex";
+                } else {
+                    post.style.display = "none";
+                }
+            });
+        }
+
+        searchBox?.addEventListener("input", filterPosts);
+        searchBoxMobile?.addEventListener("input", filterPosts);
+
+        document.addEventListener("keydown", function (event) {
+            const isCtrl = event.ctrlKey;
+            const isK = event.key === "k";
+            if (isCtrl && isK) {
+                event.preventDefault();
+                searchBox?.focus();
+            }
+        });
+
+        searchBox?.addEventListener("focus", () => {
+            searchBox.placeholder =
+                "Search by title or date (e.g., 13 Aug 2025, Aug 2025, 2024, 10, Monday, today)";
+        });
+
+        searchBox?.addEventListener("blur", () => {
+            searchBox.placeholder = "Search Fragments (Ctrl + K)";
+        });
+
+        searchBoxMobile?.addEventListener("focus", () => {
+            searchBoxMobile.placeholder = "Search by title, date, or day";
+        });
+
+        searchBoxMobile?.addEventListener("blur", () => {
+            searchBoxMobile.placeholder = "Search Fragments";
+        });
+    </script>
+</Layout>

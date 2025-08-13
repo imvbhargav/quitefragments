@@ -1,0 +1,229 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+    <div
+        class="m-auto text-fglight dark:text-fgdark font-bold divide-y-2 divide-acclight/50 dark:divide-accdark/50"
+    >
+        <h3 class="text-center py-6 text-fglight dark:text-fgdark">
+            Appearance
+        </h3>
+        <div
+            class="flex flex-wrap items-center gap-6 md:gap-12 flex-col m-6 md:m-12"
+        >
+            <div
+                class="w-full md:w-1/2 m-auto border-2 border-acclight/50 dark:border-accdark/50"
+            >
+                <p class="text-center py-1">Theme</p>
+                <button
+                    id="theme-toggle"
+                    class="w-full mt-2 px-8 py-2 bg-bgdark dark:bg-bglight border-t-2 border-acclight/50 dark:border-accdark/50"
+                >
+                    <span class="hidden dark:block text-fglight">Light</span>
+                    <span class="block dark:hidden text-fgdark">Dark</span>
+                </button>
+            </div>
+            <div
+                class="w-full md:w-1/2 m-auto border-2 border-acclight/50 dark:border-accdark/50"
+            >
+                <p class="mb-2 py-1 text-center">Color Scheme</p>
+                <div
+                    class="flex flex-wrap w-full border-t-2 border-acclight/50 dark:border-accdark/50 divide-x-2 divide-acclight/50 dark:divide-accdark/50"
+                >
+                    <div
+                        class="flex-1 divide-y-2 divide-acclight/50 dark:divide-accdark/50"
+                    >
+                        <button
+                            value="classic"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#ffffff] text-[#24292e] dark:bg-[#1a1c1e] dark:text-[#e1e4e8] px-8 py-2 font-bold"
+                        >
+                            Classic
+                        </button>
+                        <button
+                            value="catppuccin"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#eff1f5] text-[#4c4f69] dark:bg-[#1e1e2e] dark:text-[#cdd6f4] px-8 py-2 font-bold"
+                        >
+                            Catppuccin
+                        </button>
+                        <button
+                            value="retrosunset"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#fbf1c7] text-[#3c3836] dark:bg-[#282828] dark:text-[#ebdbb2] px-8 py-2 font-bold"
+                        >
+                            Retro Sunset
+                        </button>
+                        <button
+                            value="ocean"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#f2f4f7] text-[#3c4355] dark:bg-[#1e2029] dark:text-[#c4d1e2] px-8 py-2 font-bold"
+                        >
+                            Ocean
+                        </button>
+                    </div>
+                    <div
+                        class="flex-1 divide-y-2 divide-acclight/50 dark:divide-accdark/50"
+                    >
+                        <button
+                            value="everforest"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#fdf6e3] text-[#53463a] dark:bg-[#272e33] dark:text-[#d3c6aa] px-8 py-2 font-bold"
+                        >
+                            Everforest
+                        </button>
+                        <button
+                            value="modern"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#ffffff] text-[#1f1f1f] dark:bg-[#161618] dark:text-[#d4d4d4] px-8 py-2 font-bold"
+                        >
+                            Modern
+                        </button>
+                        <button
+                            value="elegant"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#f5f6f8] text-[#383b4b] dark:bg-[#292d3e] dark:text-[#c3c6d2] px-8 py-2 font-bold"
+                        >
+                            Elegant
+                        </button>
+                        <button
+                            value="deepcontrast"
+                            onclick="window.colorSchemeChange(this.value)"
+                            class="flex-1 w-full bg-[#ffffff] text-[#000000] dark:bg-[#000000] dark:text-[#f4f4f4] px-8 py-2 font-bold"
+                        >
+                            Deep Contrast
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="w-full md:w-1/2 m-auto border-2 border-acclight/50 dark:border-accdark/50"
+            >
+                <p class="mb-2 py-1 text-center">Font Family</p>
+                <div
+                    class="flex flex-wrap w-full border-t-2 border-acclight/50 dark:border-accdark/50 divide-x-2 divide-acclight/50 dark:divide-accdark/50"
+                >
+                    <div
+                        class="flex-1 divide-y-2 divide-acclight/50 dark:divide-accdark/50"
+                    >
+                        <button
+                            data-font="var(--font-space)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-space bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            Space Grotesk
+                        </button>
+                        <button
+                            data-font="var(--font-atkinson)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-atkinson bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            Atkinson Hyperlegible
+                        </button>
+                        <button
+                            data-font="var(--font-cormorant)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-cormorant bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            Cormorant Garamond
+                        </button>
+                        <button
+                            data-font="var(--font-arvo)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-arvo bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            Arvo
+                        </button>
+                        <button
+                            data-font="var(--font-inter)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-inter bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            Inter
+                        </button>
+                        <button
+                            data-font="var(--font-playfair)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-playfair bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            Playfair Display
+                        </button>
+                        <button
+                            data-font="var(--font-ibmplexmono)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-ibmplexmono bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            IBM Plex Mono
+                        </button>
+                        <button
+                            data-font="var(--font-dancing)"
+                            class="font-btn flex-1 w-full px-8 py-2 font-bold font-dancing bg-acclight/5 dark:bg-accdark/5"
+                        >
+                            Dancing Script
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script is:inline>
+        const toggle = document.getElementById("theme-toggle");
+
+        // Set the correct icon initially.
+        toggle?.addEventListener("click", () => {
+            document.documentElement.classList.toggle("dark");
+
+            // Set the new theme in local storage.
+            localStorage.setItem(
+                "theme",
+                localStorage.getItem("theme") === "dark" ? "light" : "dark",
+            );
+        });
+
+        // Restore saved font on load
+        const savedFont = localStorage.getItem("uifont");
+        if (savedFont) {
+            document.documentElement.style.setProperty(
+                "--font-uifont",
+                savedFont,
+            );
+        }
+
+        const fontButtons = document.querySelectorAll(".font-btn");
+
+        function updateSelectedButton(selectedFont) {
+            fontButtons.forEach((btn) => {
+                if (btn.dataset.font === selectedFont) {
+                    btn.classList.add(
+                        "ring",
+                        "ring-accent",
+                        "bg-acclight/15",
+                        "dark:bg-accdark/15",
+                    );
+                } else {
+                    btn.classList.remove(
+                        "ring",
+                        "ring-accent",
+                        "bg-acclight/15",
+                        "dark:bg-accdark/15",
+                    );
+                }
+            });
+        }
+
+        // Initialize highlight
+        updateSelectedButton(savedFont || "var(--font-space)");
+
+        fontButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const selectedFont = btn.dataset.font;
+
+                // Set CSS var
+                document.documentElement.style.setProperty(
+                    "--font-uifont",
+                    selectedFont,
+                );
+
+                // Save to localStorage
+                localStorage.setItem("uifont", selectedFont);
+
+                // Update highlight
+                updateSelectedButton(selectedFont);
+            });
+        });
+    </script>
+</Layout>

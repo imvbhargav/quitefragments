@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+@plugin "@tailwindcss/typography";
+
+@theme {
+    --color-bglight: #ffffff;
+    --color-bgdark: #1a1c1e;
+
+    --color-fglight: #24292e;
+    --color-fgdark: #e1e4e8;
+
+    --color-acclight: #0366d6;
+    --color-accdark: #58a6ff;
+
+    --font-space: "Space Grotesk", sans-serif;
+    --font-atkinson: "Atkinson Hyperlegible", sans-serif;
+    --font-cormorant: "Cormorant Garamond", sans-serif;
+    --font-arvo: "Arvo", sans-serif;
+    --font-inter: "Inter", sans-serif;
+    --font-playfair: "Playfair Display", sans-serif;
+    --font-ibmplexmono: "IBM Plex Mono", monospace;
+    --font-dancing: "Dancing Script", cursive;
+
+    --font-uifont: var(--font-space);
+}
+
+.underline-wavy {
+    text-decoration-line: underline;
+    text-decoration-style: wavy;
+}

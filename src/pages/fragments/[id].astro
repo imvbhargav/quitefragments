@@ -1,21 +1,17 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import ShareButton from "../../components/ShareButton.astro";
-import { getCollection, render } from "astro:content";
+import { getEntry, render } from "astro:content";
 
-export async function getStaticPaths() {
-    const posts = await getCollection("fragments");
-    return posts.map((post) => ({
-        params: { id: post.id },
-        props: { post },
-    }));
+const { id } = Astro.params;
+const post = await getEntry("fragments", id);
+
+if (!post) {
+    throw new Error(`Post not found: ${id}`);
 }
 
-const { post } = Astro.props;
 const { Content } = await render(post);
-
-// We'll use this later for OG image
-const ogImage = `/og-image/${encodeURIComponent(post.data.title)}.png`;
+const ogImage = `/og-image/${encodeURIComponent(id)}.png`;
 ---
 
 <Layout
@@ -33,9 +29,11 @@ const ogImage = `/og-image/${encodeURIComponent(post.data.title)}.png`;
             </p>
             <h1 class="text-fglight dark:text-fgdark">{post.data.title}</h1>
         </div>
+
         <div class="py-6 px-2 lg:px-12">
             <Content />
         </div>
+
         <ShareButton
             title={post.data.title}
             description={post.data.description}

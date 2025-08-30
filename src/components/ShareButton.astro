@@ -10,15 +10,17 @@ const { title, description, url } = Astro.props;
         Liked this fragment? Share it with friends!
     </p>
 
-    <button
-        class="px-4 py-2 rounded-lg bg-acclight/50 text-fglight dark:text-fgdark dark:bg-accdark/50 hover:opacity-90 transition flex items-center gap-2"
-        data-title={title}
-        data-text={description}
-        data-url={url}
-    >
-        <SquareArrowUpRight />
-        Share this fragment
-    </button>
+    <div class="bg-acclight/25 overflow-hidden p-1 rounded-lg">
+        <button
+            class="px-4 py-2 rounded-lg bg-acclight/50 text-fglight dark:text-fgdark dark:bg-accdark/50 hover:bg-transparent hover:scale-110 flex items-center gap-2 transition-all duration-300"
+            data-title={title}
+            data-text={description}
+            data-url={url}
+        >
+            <SquareArrowUpRight />
+            Share this fragment
+        </button>
+    </div>
 
     <script is:inline>
         const btn = document.currentScript.previousElementSibling; // the <button>

@@ -28,3 +28,36 @@
     text-decoration-line: underline;
     text-decoration-style: wavy;
 }
+
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-group(*) {
+    animation-duration: 0.5s;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* Hide scrollbar for Chrome, Safari and Edge */
+html::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Firefox */
+html {
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for IE, Edge (legacy) */
+body {
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+/* Still allow scrolling */
+html,
+body {
+    overflow: auto;
+}

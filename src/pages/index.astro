@@ -34,14 +34,28 @@ import { Search } from "@lucide/astro";
             sortedPosts.map((post) => (
                 <a
                     href={`/fragments/${post.id}`}
-                    class="py-4 px-2 lg:px-12 flex gap-4 items-center hover:font-semibold post-link"
+                    class="py-4 px-2 lg:px-12 flex gap-4 items-center post-link hover:bg-acclight/15 dark:hover:bg-accdark/15 transition-all duration-300"
                     data-title={post.data.title.toLowerCase()}
                     data-date={post.data.date.toISOString()}
                     data-date-string={post.data.date.toDateString()}
                 >
                     <div class="flex-1 flex-col-reverse md:flex-row flex md:items-center justify-between">
-                        <p>{post.data.title}</p>
-                        <p class="text-xs text-fglight/50 dark:text-fgdark/50 md:w-48 md:text-right">
+                        <div>
+                            <p
+                                style={`view-transition-name: ${post.id}`}
+                                class="text-xl font-semibold"
+                            >
+                                {post.data.title}
+                            </p>
+
+                            <p class="text-sm text-fglight/50 dark:text-fgdark/50 ">
+                                {post.data.description}
+                            </p>
+                        </div>
+                        <p
+                            style={`view-transition-name: date-${post.id}`}
+                            class="text-xs text-fglight/50 dark:text-fgdark/50 md:w-48 md:text-right"
+                        >
                             {post.data.date.toDateString()}
                         </p>
                     </div>

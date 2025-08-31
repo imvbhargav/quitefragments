@@ -5,7 +5,7 @@
   "scripts": {
     "generate:og": "node scripts/generate-og.js",
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "npm run generate:og && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },

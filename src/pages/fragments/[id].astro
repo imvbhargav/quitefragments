@@ -11,7 +11,7 @@ if (!post) {
 }
 
 const { Content } = await render(post);
-const ogImage = `/og-image/${encodeURIComponent(post.data.title)}.png`;
+const ogImage = `/og/${encodeURIComponent(post.id)}.png`;
 ---
 
 <Layout

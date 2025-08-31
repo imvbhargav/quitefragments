@@ -32,7 +32,6 @@ const { title, description, url } = Astro.props;
         };
 
         btn.addEventListener("click", async () => {
-            console.log(shareData);
             if (navigator.share) {
                 try {
                     await navigator.share(shareData);

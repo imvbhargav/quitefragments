@@ -1,6 +1,6 @@
 ---
 import { SquareArrowUpRight } from "@lucide/astro";
-const { title, description, url } = Astro.props;
+const { title, description } = Astro.props;
 ---
 
 <div
@@ -13,10 +13,10 @@ const { title, description, url } = Astro.props;
     <div class="bg-acclight/25 overflow-hidden p-1 rounded-lg">
         <button
             id="share_button"
+            type="button"
             class="px-4 py-2 rounded-lg bg-acclight/50 text-fglight dark:text-fgdark dark:bg-accdark/50 hover:bg-transparent hover:scale-110 flex items-center gap-2 transition-all duration-300"
             data-title={title}
             data-text={description}
-            data-url={url}
         >
             <SquareArrowUpRight />
             Share this fragment
@@ -25,13 +25,14 @@ const { title, description, url } = Astro.props;
 
     <script is:inline>
         const btn = document.getElementById("share_button");
-        const shareData = {
-            title: btn.dataset.title,
-            text: btn.dataset.text,
-            url: btn.dataset.url,
-        };
 
         btn.addEventListener("click", async () => {
+            const shareData = {
+                title: btn.dataset.title,
+                text: btn.dataset.text,
+                url: window.location.href,
+            };
+
             if (navigator.share) {
                 try {
                     await navigator.share(shareData);

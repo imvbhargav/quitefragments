@@ -9,7 +9,7 @@ const {
     ogImage,
 } = Astro.props;
 
-const siteUrl = "https://quitefragments.netlify.app"; // change to your site URL
+const siteUrl = Astro.url.origin;
 const fullOgImage = ogImage ? siteUrl + ogImage : siteUrl + "/default-og.png";
 ---
 

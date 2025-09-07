@@ -8,6 +8,7 @@ const fragments = defineCollection({
     slug: z.string(),
     date: z.date(),
     description: z.string().optional(),
+    embeds: z.union([z.string(), z.array(z.string())]).optional(),
   }),
 });
 

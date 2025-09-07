@@ -3,6 +3,8 @@ import Layout from "../../layouts/Layout.astro";
 import ShareButton from "../../components/ShareButton.astro";
 import { getCollection, getEntry, render } from "astro:content";
 
+import YouTube from "../../components/YouTube.astro";
+
 // Generate all static paths for this [id] route
 export async function getStaticPaths() {
     const posts = await getCollection("fragments");
@@ -21,6 +23,14 @@ if (!post) {
 
 const { Content } = await render(post);
 const ogImage = `/og/${encodeURIComponent(post.id)}.png`;
+
+const embedList = post.data.embeds
+    ? Array.isArray(post.data.embeds)
+        ? post.data.embeds
+        : [post.data.embeds]
+    : [];
+
+console.log(embedList);
 ---
 
 <Layout
@@ -30,7 +40,7 @@ const ogImage = `/og/${encodeURIComponent(post.id)}.png`;
     ogImage={ogImage}
 >
     <article
-        class="prose max-w-none prose-blockquote:border-acclight/50 dark:prose-blockquote:border-accdark/50 prose-blockquote:text-fglight dark:prose-blockquote:text-fgdark md:prose-lg lg:prose-xl prose-h1:text-3xl md:prose-h1:text-4xl lg:prose-h1:text-5xl prose-slate text-fglight dark:text-fgdark dark:prose-invert divide-y-2 divide-acclight/50 dark:divide-accdark/50"
+        class="prose max-w-none prose-blockquote:border-acclight/50 dark:prose-blockquote:border-accdark/50 prose-blockquote:text-fglight dark:prose-blockquote:text-fgdark md:prose-lg lg:prose-xl prose-h1:text-3xl md:prose-h1:text-4xl lg:prose-h1:text-5xl prose-slate text-fglight dark:text-fgdark dark:prose-invert divide-y-2 divide-acclight/50 dark:divide-accdark/50 prose-headings:text-fglight prose-headings:dark:text-fgdark"
     >
         <div class="py-6 px-2 lg:px-12">
             <p
@@ -49,6 +59,16 @@ const ogImage = `/og/${encodeURIComponent(post.id)}.png`;
 
         <div class="py-6 px-2 lg:px-12">
             <Content />
+
+            <div class="mt-10">
+                <h4 class="text-center underline">More to explore</h4>
+                {
+                    embedList &&
+                        embedList.map((url) => {
+                            return <YouTube url={url} key={id} />;
+                        })
+                }
+            </div>
         </div>
 
         <ShareButton

@@ -1,0 +1,42 @@
+---
+const { url } = Astro.props;
+
+// Helper to extract IDs
+function getYouTubeId(url: string) {
+    let match = url.match(/youtu\.be\/([^?]+)/);
+    if (match) return match[1];
+
+    match = url.match(/\/embed\/([^?]+)/);
+    if (match) return match[1];
+
+    match = url.match(/[?&]v=([^&]+)/);
+    if (match) return match[1];
+
+    return url;
+}
+
+const id = getYouTubeId(url);
+---
+
+<!-- Load web component only in browser -->
+<link
+    rel="stylesheet"
+    href="../../node_modules/lite-youtube-embed/src/lite-yt-embed.css"
+/>
+<script src="../../node_modules/lite-youtube-embed/src/lite-yt-embed.js"
+></script>
+
+<div
+    class="p-1.5 md:p-3 bg-acclight/15 dark:bg-accdark/15 rounded-lg border-2 border-fglight/25 dark:border-fgdark/25"
+>
+    <lite-youtube
+        style="max-width: none; border-radius: 0.5rem;"
+        class="shadow-2xl"
+        videoid={id}></lite-youtube>
+</div>
+
+<style>
+    iframe {
+        width: 100% !important;
+    }
+</style>

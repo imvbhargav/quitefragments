@@ -1,7 +1,7 @@
 ---
 title: "The Cost of Decision"
 slug: "the-cost-of-decision"
-date: 2026-06-25
+date: 2026-06-26
 description: "A reflection on why every decision has consequences, and why refusing to choose is often the most expensive choice of all."
 ---
 

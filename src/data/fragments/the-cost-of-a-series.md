@@ -5,8 +5,6 @@ date: 2026-06-25
 description: "A welcome to a collection of essays where philosophy meets satire, curiosity, and everyday life."
 ---
 
-## The Cost Of... A series 
-
 Human beings have a strange relationship with certainty.
 
 We spend our lives trying to understand ourselves, each other, and the world around us. Sometimes we succeed. More often, we become very confident about things that deserve a little more doubt.

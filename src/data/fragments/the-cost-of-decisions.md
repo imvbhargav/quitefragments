@@ -1,6 +1,8 @@
 ---
-title: The cost of decisions 
-date: 2026-06-26
+title: "The Cost of Decision"
+slug: "the-cost-of-decision"
+date: 2026-06-25
+description: "A reflection on why every decision has consequences, and why refusing to choose is often the most expensive choice of all."
 ---
 
 Stand in front of two identical doors long enough and something strange happens.

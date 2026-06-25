@@ -25,7 +25,7 @@ And if you leave with more questions than you arrived with, perhaps the pages ha
 
 ---
 
-A note on AI
+## A note on AI
 
 These essays were written by me with AI used as an editorial collaborator. It helped refine language, improve structure, and challenge weak arguments, but the perspective, ideas, and final editorial decisions are my own.
 
